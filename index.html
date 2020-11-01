@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://cdn.staticfile.org/axios/0.18.0/axios.min.js"></script>
+<style>
+table{
+	text-align:left;
+	font-family: 'Open Sans',sans-serif;
+	width:500px;
+	border-collapse:collapse;
+	border:2px solid #444777;
+	margin: 10px;
+
+}
+table th {
+	background: #444777;
+	color:#FFF;
+	padding:5px;
+	min-width:30px;
+
+}
+table td{
+	padding: 5px;
+	border-right: 2px solid #444777;
+
+}
+table tbody tr:nth-child(2n){
+	background: #D4D8F9;
+}
+.arrow-up {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid white;
+  display: inline-block;
+  margin-bottom: 2px;
+}
+
+.arrow-down {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid white;
+  display: inline-block;
+  margin-bottom: 1px;
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+  <table >
+  <thead>
+     <tr >
+     	<th v-for="value,i in columns" v-on:click="sort(i)">{{i}}<div v-bind:class="columns[i]"></div></th>
+     </tr>
+  </thead>
+  <tbody>
+    <tr v-for="sale in lesson" >
+       <td >{{ sale.id  }}</td> 
+        <td >{{ sale.name  }}</td> 
+         <td >{{ sale.phone  }}</td> 
+    
+       
+    </tr>
+   </tbody>
+</table>
+
+</div>
+<script>
+var app = new Vue({
+  el: "#app",
+  data: {
+  	columns:{
+  		id:'ID',
+  		name:'Fill Name',
+  		phone:'Phone',
+  	},
+  	rows:[
+  		{id:1,name:"Test Name 1",phone:'305-917-1301'},
+  		{id:2,name:"Test Name 2",phone:'210-684-8953'},
+  		{id:3,name:"Test Name 3",phone:'765-338-0312'},
+  	],
+  	lesson:[],
+  },
+
+
+created() {
+  // GET request using fetch with error handling
+  fetch("https://jsonplaceholder.typicode.com/users")
+    .then(async response => {
+      const data = await response.json();
+
+      // check for error response
+      if (!response.ok) {
+        // get error message from body or default to response statusText
+        const error = (data && data.message) || response.statusText;
+        return Promise.reject(error);
+      }
+      this.lesson = data;
+
+      //console.log(data[0].id);
+    })
+    .catch(error => {
+      this.errorMessage = error;
+      console.error("There was an error!", error);
+    });
+},
+methods: {
+    sort: function(type) {
+      if(this.sort_as) {
+        this.lesson.sort((a, b) => (a[type] > b[type]) ? 1 : ((b[type] > a[type]) ? -1 : 0))
+        this.columns[type] = "arrow-up"
+      }
+      else {
+        this.lesson.sort((a, b) => (a[type] < b[type]) ? 1 : ((b[type] < a[type]) ? -1 : 0))
+        this.columns[type] = "arrow-down"
+      }
+
+      Object.keys(this.columns).forEach(_key => {
+        if(_key != type)
+          this.columns[_key] = ""
+      })
+
+      this.sort_as = !this.sort_as
+    }
+  }
+
+
+
+
+})
+
+</script>
+</body>
+</html>
